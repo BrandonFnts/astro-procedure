@@ -1,11 +1,169 @@
 ---
-import Welcome from '../components/Welcome.astro';
-import Layout from '../layouts/Layout.astro';
+import Layout from "../layouts/layout.astro";
+import sql from "mssql";
+import "dotenv/config";
 
-// Welcome to Astro! Wondering what to do next? Check out the Astro documentation at https://docs.astro.build
-// Don't want to use any of this? Delete everything in this file, the `assets`, `components`, and `layouts` directories, and start fresh.
+const dbConfig: sql.config = {
+    user: process.env.DB_USER ?? "sa",
+    password: "123456789",
+    server: "127.0.0.1",
+    database: "master",
+    options: {
+        encrypt: true,
+        trustServerCertificate: true,
+    },
+};
+
+if (Astro.request.method === "POST") {
+    try {
+        const formData = await Astro.request.formData();
+
+        const dbname = formData.get("dbname")?.toString();
+        const datafilename = formData.get("datafilename")?.toString();
+        const logfilename = formData.get("logfilename")?.toString();
+
+        if (!dbname || !datafilename || !logfilename) {
+            throw new Error("Faltan campos requeridos");
+        }
+
+        const params = {
+            dbname,
+            datafilename,
+            logfilename,
+            datasizeMB: parseInt(formData.get("datasizeMB")?.toString() || "0"),
+            logsizeMB: parseInt(formData.get("logsizeMB")?.toString() || "0"),
+            filegrowthPercent: parseInt(
+                formData.get("filegrowthPercent")?.toString() || "0",
+            ),
+            maxsizeMB: parseInt(formData.get("maxsizeMB")?.toString() || "0"),
+        };
+
+        let pool: sql.ConnectionPool | null = null;
+
+        try {
+            pool = await sql.connect(dbConfig);
+            const request = new sql.Request(pool);
+
+            await request
+                .input("dbname", sql.NVarChar, params.dbname)
+                .input("datafilename", sql.NVarChar, params.datafilename)
+                .input("logfilename", sql.NVarChar, params.logfilename)
+                .input("datasizeMB", sql.Int, params.datasizeMB)
+                .input("logsizeMB", sql.Int, params.logsizeMB)
+                .input("filegrowthPercent", sql.Int, params.filegrowthPercent)
+                .input("maxsizeMB", sql.Int, params.maxsizeMB)
+                .query(
+                    "EXEC CreateCustomDatabase @dbname, @datafilename, @logfilename, @datasizeMB, @logsizeMB, @filegrowthPercent, @maxsizeMB",
+                );
+
+            console.log("Base de datos creada exitosamente");
+        } catch (error) {
+            if (error instanceof Error) {
+                console.error("Error:", error.message);
+            } else {
+                console.error("Error desconocido:", error);
+            }
+        } finally {
+            if (pool) {
+                await pool.close();
+            }
+        }
+    } catch (error) {
+        console.error("Error al procesar el formulario:", error);
+    }
+}
 ---
 
 <Layout>
-	<Welcome />
+    <div class="min-h-screen bg-gray-100 flex items-center justify-center p-4">
+        <form method="POST" enctype="multipart/form-data" class="bg-white p-8 rounded-lg shadow-md w-full max-w-md">
+            <h1 class="text-2xl font-bold mb-6 text-center">Crear Base de Datos</h1>
+
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Nombre de la BD</label>
+                    <input
+                        type="text"
+                        name="dbname"
+                        placeholder="Nombre BD"
+                        required
+                        class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                    />
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Ruta del archivo .mdf</label>
+                    <input
+                        type="text"
+                        name="datafilename"
+                        placeholder="Ruta .mdf"
+                        required
+                        class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                    />
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Ruta del archivo .ldf</label>
+                    <input
+                        type="text"
+                        name="logfilename"
+                        placeholder="Ruta .ldf"
+                        required
+                        class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                    />
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Tamaño de datos (MB)</label>
+                    <input
+                        type="number"
+                        name="datasizeMB"
+                        placeholder="Tamaño datos (MB)"
+                        required
+                        class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                    />
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Tamaño del log (MB)</label>
+                    <input
+                        type="number"
+                        name="logsizeMB"
+                        placeholder="Tamaño log (MB)"
+                        required
+                        class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                    />
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Crecimiento (%)</label>
+                    <input
+                        type="number"
+                        name="filegrowthPercent"
+                        placeholder="Crecimiento (%)"
+                        required
+                        class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                    />
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Tamaño máximo (MB)</label>
+                    <input
+                        type="number"
+                        name="maxsizeMB"
+                        placeholder="Tamaño máximo (MB)"
+                        required
+                        class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                    />
+                </div>
+            </div>
+
+            <button
+                type="submit"
+                class="w-full mt-6 bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+            >
+                Crear Base de Datos
+            </button>
+        </form>
+    </div>
 </Layout>
