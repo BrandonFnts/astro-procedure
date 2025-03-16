@@ -20,10 +20,29 @@ export async function getDatabases(): Promise<any[]> {
         const request = new sql.Request(pool);
 
         const result = await request.query("EXEC GetDatabases_SP");
-        
+
         return result.recordset;
     } catch (error) {
         console.error("Error al obtener las bases de datos:", error);
+        return [];
+    } finally {
+        if (pool) {
+            await pool.close();
+        }
+    }
+}
+
+export async function getUsersWithLogins(): Promise<any[]> {
+    let pool: sql.ConnectionPool | null = null;
+    try {
+        pool = await sql.connect(dbConfig);
+        const request = new sql.Request(pool);
+
+        const result = await request.query("EXEC GetLoginsWithUsersAndPermissions");
+
+        return result.recordset;
+    } catch (error) {
+        console.error("Error al obtener los Usuarios:", error);
         return [];
     } finally {
         if (pool) {
@@ -146,6 +165,54 @@ export async function getLogs(params: {
     } catch (error) {
         console.error("Error obteniendo logs:", error);
         throw error;
+    } finally {
+        if (pool) {
+            await pool.close();
+        }
+    }
+}
+
+export async function getUserDatabases(params: {
+    searchString?: String;
+}): Promise<any[]> {
+    let pool: sql.ConnectionPool | null = null;
+    try {
+        pool = await sql.connect(dbConfig);
+        const request = new sql.Request(pool);
+
+        const result = await request
+            .input("SearchString", sql.NVarChar, params.searchString || null)
+            .query("EXEC GetUserDatabases @SearchString");
+
+        return result.recordset;
+    } catch (error) {
+        console.error("Error al obtener las Bases de Datos:", error);
+        return [];
+    } finally {
+        if (pool) {
+            await pool.close();
+        }
+    }
+}
+
+export async function deleteUserAndLogin(params: {
+    loginName: String;
+    userName: String;
+}): Promise<any[]> {
+    let pool: sql.ConnectionPool | null = null;
+    try {
+        pool = await sql.connect(dbConfig);
+        const request = new sql.Request(pool);
+
+        const result = await request
+            .input("LoginName", sql.NVarChar, params.loginName)
+            .input("UserName", sql.NVarChar, params.userName)
+            .query("EXEC DeleteUserAndLogin @LoginName = @LoginName, @UserName = @UserName");
+
+        return result.recordset;
+    } catch (error) {
+        console.error("Error al eliminar el usuario:", error);
+        return [];
     } finally {
         if (pool) {
             await pool.close();
