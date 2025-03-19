@@ -219,3 +219,28 @@ export async function deleteUserAndLogin(params: {
         }
     }
 }
+
+export async function createBackup(params: {
+    databaseName: string;
+    path: string;
+}): Promise<any[]> {
+    let pool: sql.ConnectionPool | null = null;
+    try {
+        pool = await sql.connect(dbConfig);
+        const request = pool.request();
+        
+        request.input("DatabaseName", sql.NVarChar, params.databaseName);
+        request.input("BackupPath", sql.NVarChar, params.path);
+
+        const result = await request.execute("BackupDatabaseFull");
+
+        return result.recordset;
+    } catch (error) {
+        console.error("Error al crear el backup:", error);
+        return [];
+    } finally {
+        if (pool) {
+            await pool.close();
+        }
+    }
+}
