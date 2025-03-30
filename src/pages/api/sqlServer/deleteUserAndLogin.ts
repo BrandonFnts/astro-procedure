@@ -1,5 +1,5 @@
 import { type APIRoute } from 'astro';
-import { deleteUserAndLogin } from '../../backend/databaseService';
+import { deleteUserAndLogin } from '../../../backend/databaseService';
 
 export const DELETE: APIRoute = async ({ request }) => {
   try {

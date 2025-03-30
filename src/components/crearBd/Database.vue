@@ -76,7 +76,7 @@
           if ((form.value.datafilegrowthMB === null && form.value.datafilegrowthPercent === null) || (form.value.logfilegrowthMB === null && form.value.logfilegrowthPercent === null)) {
             throw new Error("Debe especificar el crecimiento del archivo de datos y log en MB o porcentaje.");
           }
-          const response = await fetch('/api/createDatabase', {
+          const response = await fetch('/api/sqlServer/createDatabase', {
             method: 'POST', headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(form.value)
           });

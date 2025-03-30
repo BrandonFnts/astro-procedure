@@ -1,5 +1,5 @@
 import { type APIRoute } from "astro";
-import { manageDatabaseSecurity } from '../../backend/databaseService';
+import { manageDatabaseSecurity } from '../../../backend/databaseService';
 
 export const POST: APIRoute = async ({ request }) => {
   try {

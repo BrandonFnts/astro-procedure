@@ -1,0 +1,13 @@
+---
+import DatabaseManagement from '../../components/mongo/administracion/ManagementMongo.vue';
+import Layout from '../../layouts/layout.astro';
+const { dbName } = Astro.params;
+
+if (!dbName || typeof dbName !== 'string') {
+  return Astro.redirect('/Mongo');
+}
+---
+
+<Layout title={`Administración de ${dbName}`}>
+  <DatabaseManagement dbName={dbName}  client:load/>
+</Layout>

@@ -6,9 +6,13 @@ import tailwindcss from '@tailwindcss/vite';
 
 import icon from "astro-icon";
 
+import node from '@astrojs/node';
+
 // https://astro.build/config
 export default defineConfig({
+  base: '/',
   output: "server",
+
   integrations: [
     vue(),
     icon({
@@ -18,7 +22,12 @@ export default defineConfig({
       }
     })
   ],
+
   vite: {
     plugins: [tailwindcss()]
-  }
+  },
+
+  adapter: node({
+    mode: 'standalone'
+  })
 });

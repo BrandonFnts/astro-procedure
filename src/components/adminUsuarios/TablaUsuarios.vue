@@ -129,7 +129,7 @@ export default {
         const fetchLoginsData = async () => {
             try {
                 loading.value = true;
-                const response = await fetch('/api/getUsersWithLogins');
+                const response = await fetch('/api/sqlServer/getUsersWithLogins');
                 const data = await response.json();
                 logins.value = data.users;
             } catch (error) {
@@ -152,7 +152,7 @@ export default {
             try {
                 const payload = { loginName, userName };
 
-                const response = await fetch('/api/deleteUserAndLogin', {
+                const response = await fetch('/api/sqlServer/deleteUserAndLogin', {
                     method: 'DELETE',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ data: payload })

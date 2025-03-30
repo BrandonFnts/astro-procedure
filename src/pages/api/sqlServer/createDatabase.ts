@@ -1,5 +1,5 @@
 // src/pages/api/createDatabase.ts
-import { createDatabase } from "../../backend/databaseService";
+import { createDatabase } from "../../../backend/databaseService";
 import { type APIRoute } from "astro";
 
 export const POST: APIRoute = async ({ request }) => {

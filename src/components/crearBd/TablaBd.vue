@@ -95,7 +95,7 @@ export default {
         async fetchDatabases() {
             this.loading = true;
             try {
-                const response = await fetch('/api/getDatabases');
+                const response = await fetch('/api/sqlServer/getDatabases');
                 const result = await response.json();
                 if (response.ok) {
                     console.log(result);

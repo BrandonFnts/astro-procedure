@@ -285,7 +285,7 @@ const isSectionOpen = ref({
 const searchDatabases = debounce(async (searchTerm: string) => {
   try {
     loadingDatabases.value = true;
-    const response = await fetch('/api/getUserDatabases', {
+    const response = await fetch('/api/sqlServer/getUserDatabases', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ searchString: searchTerm })
@@ -398,7 +398,7 @@ const handleSubmit = async () => {
       rolesMembership: formData.value.rolesMembership.join(',')
     };
 
-    const response = await fetch('/api/createUsers', {
+    const response = await fetch('/api/sqlServer/createUsers', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload)

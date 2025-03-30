@@ -3,9 +3,9 @@ import sql from "mssql";
 import "dotenv/config";
 
 const dbConfig: sql.config = {
-    user: process.env.DB_USER ?? "AdminUser",
+    user: process.env.DB_USER ?? "AdminBd",
     password: "123456789",
-    server: "127.0.0.1",
+    server: "localhost",
     database: "AdminTools",
     options: {
         encrypt: true,

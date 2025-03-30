@@ -1,6 +1,6 @@
 // src/pages/api/logs.ts
 import { type APIRoute } from "astro";
-import { getLogs } from "../../backend/databaseService";
+import { getLogs } from "../../../backend/databaseService";
 
 // Función de validación de fecha ISO 8601
 const isValidISODate = (dateString: string): boolean => {

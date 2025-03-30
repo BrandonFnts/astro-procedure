@@ -111,7 +111,7 @@ const selectDatabase = (db: Database) => {
 const searchDatabases = debounce(async (searchTerm: string) => {
     try {
         loadingDatabases.value = true;
-        const response = await fetch('/api/getUserDatabases', {
+        const response = await fetch('/api/sqlServer/getUserDatabases', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ searchString: searchTerm })
@@ -174,7 +174,7 @@ const runBackup = async () => {
     try {
         submitting.value = true;
         errorMessage.value = '';
-        const response = await fetch('/api/createBackup', {
+        const response = await fetch('/api/sqlServer/createBackup', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(formData.value)

@@ -191,7 +191,7 @@ const fetchLogs = async () => {
             usuario: filters.usuario
         }
 
-        const response = await axios.post('/api/getLogs', params)
+        const response = await axios.post('/api/sqlServer/getLogs', params)
         logs.value = response.data
         currentPage.value = 1
     } catch (err) {
